@@ -1,45 +1,57 @@
 import React from "react";
 import {
-  FlatList,
+  // FlatList,
   Button,
-  ScrollView,
+  // ScrollView,
   StyleSheet,
-  Text,
+  // Text,
   View,
+  // SectionList,
 } from "react-native";
-import { Constants } from "expo";
+import Constants from "expo-constants";
 
-import Row from "./row";
+// import Row from "./Row";
 import contacts, { compareNames } from "./contacts";
-
+import Contactslist from "./Contactslist";
+import AddContactForm from './AddContactForm'
 export default class App extends React.Component {
   state = {
-    showContacts: true,
+    showContacts: false,
+    showForm: false,
+    contacts: contacts,
   };
+
+  addContact = (newContact) => {
+    console.log("added")
+    this.setState(prevState => ({showForm: false, contacts: [...prevState.contacts, newContact] }))
+  }
 
   toggleContacts = () => {
     this.setState((prevState) => ({ showContacts: !prevState.showContacts }));
   };
 
-  renderItem = (obj) => <Row {...obj.item} />;
-  
+  toggleForm = () => {
+    this.setState((prevState) => ({ showForm: !prevState.showForm }));
+  };
+
   sort = () => {
-    this.setState((prevState) => {
-      contacts: [...prevState.contacts].sort(compareNames);
-    });
+    this.setState((prevState) => ({
+      contacts: [...prevState.contacts].sort(compareNames),
+    }));
   };
 
   render() {
+
+    if(this.state.showForm) return <AddContactForm onSubmit={this.addContact} />
+
     return (
       <View style={styles.container}>
-        <h1>Hello World!!!!</h1>
-        <Button title="toggle contacts" onPress={this.toggleContacts} />
-        <Button title="sort" onPress={this.sort} />
-
+        <Button style={styles.button} title="toggle contacts" onPress={this.toggleContacts} />
+        <Button style={styles.button} title="Add Contact" onPress={this.toggleForm} />
         {this.state.showContacts ? (
-          <FlatList data={this.state.contacts} renderItem={this.renderItem} />
+          <Contactslist contacts={this.state.contacts} />
         ) : null}
-      </View>
+        </View>
     );
   }
 }
@@ -48,6 +60,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    // paddingTop: Constants.statusBarHeight,
+    paddingTop: Constants.statusBarHeight + 10,
+    margin: 10,
   },
+  button: {
+    padding: 10,
+    margin: 10,
+    color: 'blue',
+  }
 });

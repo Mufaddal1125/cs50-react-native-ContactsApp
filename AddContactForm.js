@@ -1,14 +1,21 @@
 import React from "react";
-import { TextInput, StyleSheet, Button, View } from "react-native";
+import { TextInput, StyleSheet, Button, View, KeyboardAvoidingView } from "react-native";
 import PropTypes from "prop-types";
 import Constants from "expo-constants";
+
 const styles = StyleSheet.create({
+  container: {
+      flex: 1,
+      paddingTop: Constants.statusBarHeight,
+      justifyContent: 'center'
+  },
   input: {
     padding: 5,
     borderColor: "black",
     borderWidth: 2,
     margin: 10,
     borderRadius: 5,
+    justifyContent: "center",
   },
 });
 
@@ -20,37 +27,55 @@ export default class AddContactForm extends React.Component {
   state = {
     name: "",
     phone: "",
+    isFormValid: true,
   };
 
-  handleNameChange = (name) => {
-    this.setState({
-      name: name,
-    });
-  };
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      this.state.name !== prevState.name ||
+      this.state.phone !== prevState.phone
+    ) {
+      this.validateForm();
+    }
+  }
+
+  getHandler = key => val => {
+    this.setState({[key]: val})
+  }
+
+  handleNameChange = this.getHandler('name')
+  // handlePhoneChange = this.getHandler('phone')
 
   handlePhoneChange = (phone) => {
     if (+phone >= 0 && phone.length <= 10) {
-      this.setState({
-        phone: phone,
-      });
+      this.setState({ phone });
+    }
+  };
+
+  validateForm = () => {
+    if (
+      +this.state.phone >= 0 &&
+      this.state.phone.length === 10 &&
+      this.state.name.length >= 3
+    ) {
+      return this.setState({ isFormValid: false });
+    } else {
+      return this.setState({ isFormValid: true });
     }
   };
 
   handleSubmit = () => {
-    if (+this.state.phone >= 0 && this.state.phone.length <= 10 && this.state.name.length == 10) {
-
     this.props.onSubmit(this.state);
-    }
   };
 
   render() {
     return (
-      <View style={{ paddingTop: Constants.statusBarHeight + 10 }}>
+      <KeyboardAvoidingView behavior="padding" style={styles.container}>
         <TextInput
           style={styles.input}
           placeholder="Name"
           value={this.state.name}
-          onChangeText={this.handleNameChange}
+          onChangeText={this.getHandler('name')}
           autoCapitalize="words"
         />
         <TextInput
@@ -60,8 +85,12 @@ export default class AddContactForm extends React.Component {
           keyboardType="numeric"
           onChangeText={this.handlePhoneChange}
         />
-        <Button title="Submit" disabled={true}onPress={this.handleSubmit} />
-      </View>
+        <Button
+          title="Submit"
+          disabled={this.state.isFormValid}
+          onPress={this.handleSubmit}
+        />
+      </KeyboardAvoidingView>
     );
   }
 }
