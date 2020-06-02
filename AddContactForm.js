@@ -27,7 +27,7 @@ export default class AddContactForm extends React.Component {
   state = {
     name: "",
     phone: "",
-    isFormValid: true,
+    isFormValid: false,
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -39,10 +39,12 @@ export default class AddContactForm extends React.Component {
     }
   }
 
-  getHandler = key => val => {
-    this.setState({[key]: val})
+  getHandler = key => {
+    // console.warn(val)
+    return val => {
+      this.setState({[key]: val})
+    }
   }
-
   handleNameChange = this.getHandler('name')
   // handlePhoneChange = this.getHandler('phone')
 
@@ -53,14 +55,18 @@ export default class AddContactForm extends React.Component {
   };
 
   validateForm = () => {
+    console.log(this.state)
+    const names = this.state.name.split(' ')
     if (
       +this.state.phone >= 0 &&
       this.state.phone.length === 10 &&
-      this.state.name.length >= 3
+      this.state.name.length >= 3 &&
+        names.length >= 2 &&
+        names[1]
     ) {
-      return this.setState({ isFormValid: false });
-    } else {
       return this.setState({ isFormValid: true });
+    } else {
+      return this.setState({ isFormValid: false  });
     }
   };
 
@@ -87,7 +93,7 @@ export default class AddContactForm extends React.Component {
         />
         <Button
           title="Submit"
-          disabled={this.state.isFormValid}
+          disabled={!this.state.isFormValid}
           onPress={this.handleSubmit}
         />
       </KeyboardAvoidingView>
