@@ -71,6 +71,7 @@ export default class AddContactForm extends React.Component {
   };
 
   handleSubmit = () => {
+    console.log('clicked on addContacts')
     this.props.onSubmit(this.state);
   };
 
